@@ -11,6 +11,7 @@ import reviewSentences from '../../../../doc/review-sentences.md'
 const DEFAULT_STATE = {
   message: '',
   loading: false,
+  sentences: [],
 };
 
 export const getReviewUrl = (language) => {
@@ -67,12 +68,6 @@ class Review extends React.Component {
            this.props.languages.indexOf(this.getLanguageFromParams()) === -1;
   }
 
-  userHasNoLanguages() {
-    return (
-      !this.props.languages || this.props.languages.length < 1
-    );
-  }
-
   // Make sure the requests matches the user profile.
   isValidSentenceRequest() {
     if (!this.getLanguageFromParams()) {
@@ -82,15 +77,7 @@ class Review extends React.Component {
     if (this.needsRedirectToOnlyLang()) {
       return false;
     }
-
-    if (this.isInvalidLanguageRequest()) {
-      return false;
-    }
-
-    if (this.userHasNoLanguages()) {
-      return false;
-    }
-
+    
     return true;
   }
 
@@ -135,9 +122,8 @@ class Review extends React.Component {
   renderContent() {
     if (this.state.loading) {
       return <p>Loading sentences...</p>;
-    } else if (!this.getLanguageFromParams()) {
-      return <p>Please select a language to review sentences.</p>;
     } else if (!this.state.sentences || this.state.sentences.length < 1) {
+      console.log('rendercontent', this.state)
       return (
         <p>
           No sentences to review.&nbsp;
@@ -158,22 +144,7 @@ class Review extends React.Component {
       );
     }
 
-    // Make sure requested lang in url is in users languages list.
-    if (this.isInvalidLanguageRequest()) {
-      return (
-        <Redirect to={getReviewUrl()} />
-      );
-    }
 
-    // If user hasn't added any languages, ask them to do so.
-    if (this.userHasNoLanguages()) {
-      return (
-        <p>
-          You have not selected any languages. Please go to your&nbsp;
-          <Link to="/profile">Profile</Link> to select languages.
-        </p>
-      );
-    }
 
     return (
       <div>
